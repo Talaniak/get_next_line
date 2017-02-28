@@ -6,7 +6,7 @@
 /*   By: maviot <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/27 08:15:48 by maviot            #+#    #+#             */
-/*   Updated: 2017/02/28 19:01:07 by maviot           ###   ########.fr       */
+/*   Updated: 2017/02/28 19:41:37 by maviot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,7 @@ static int		ft_build_line(int const fd, char **line, char **stock)
 
 	buf = ft_strnew(BUFF_SIZE);
 	if ((bytes = read(fd, buf, BUFF_SIZE)) <= 0)
-	{
-		free(buf);
 		return (bytes);
-	}
 	build = ft_strsub(buf, 0, len_n(buf));
 	if (build[ft_strlen(build) - 1] == '\n')
 		*stock = ft_strsub(buf, len_n(buf), ft_strlen(buf));
@@ -87,6 +84,17 @@ static int		ft_check_stock(char **stock, char **line)
 	return (booln);
 }
 
+int				is_n(char *line)
+{
+	if (line[ft_strlen(line) - 1] == '\n')
+	{
+		line[ft_strlen(line) - 1] = '\0';
+		return (1);
+	}
+	else
+		return (0);
+}
+
 int				get_next_line(int const fd, char **line)
 {
 	int				bytes;
@@ -104,19 +112,14 @@ int				get_next_line(int const fd, char **line)
 	{
 		if ((bytes = ft_build_line(fd, line, &stock[fd])) <= 0)
 		{
-			if (reading == 1)
-				return (1);
-			if ((reading != 1) && (*line != NULL) && (*line[0] != '\0'))
+			if ((reading == 1) ||
+					((reading != 1) && (*line != NULL) && (*line[0] != '\0')))
 				return (1);
 			else
 				return (bytes);
 		}
 		reading = 1;
-		if (line[0][ft_strlen(*line) - 1] == '\n')
-		{
-			foundn = 1;
-			line[0][ft_strlen(*line) - 1] = '\0';
-		}
+		foundn = is_n(*line) == 1;
 	}
 	return (1);
 }
