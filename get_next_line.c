@@ -6,7 +6,7 @@
 /*   By: maviot <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/27 08:15:48 by maviot            #+#    #+#             */
-/*   Updated: 2017/01/14 01:13:26 by maviot           ###   ########.fr       */
+/*   Updated: 2017/02/28 19:01:07 by maviot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ static int		ft_build_line(int const fd, char **line, char **stock)
 	int				bytes;
 	char			*buf;
 	char			*build;
+	char			*tmp;
 
 	buf = ft_strnew(BUFF_SIZE);
 	if ((bytes = read(fd, buf, BUFF_SIZE)) <= 0)
@@ -48,7 +49,10 @@ static int		ft_build_line(int const fd, char **line, char **stock)
 		*line = build;
 	else
 	{
-		*line = ft_strjoin(*line, build);
+		tmp = ft_strsub(*line, 0, ft_strlen(*line));
+		free(*line);
+		*line = ft_strjoin(tmp, build);
+		free(tmp);
 		free(build);
 	}
 	free(buf);
@@ -90,9 +94,7 @@ int				get_next_line(int const fd, char **line)
 	int				reading;
 	static char		*stock[4096];
 
-	if (fd < 0)
-		return (-1);
-	if (line == NULL)
+	if (fd < 0 || line == NULL)
 		return (-1);
 	if ((ft_check_stock(&stock[fd], line)) == 1)
 		return (1);
